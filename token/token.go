@@ -14,6 +14,9 @@ const (
 	IDENT = "IDENT"
 	INT   = "INT"
 
+	EQ     = "=="
+	NOT_EQ = "!="
+
 	ASSIGN   = "="
 	PLUS     = "+"
 	MINUS    = "-"
