@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"fmt"
 	"interpreter-with-go/ast"
 	"interpreter-with-go/lexer"
 	"interpreter-with-go/token"
@@ -10,14 +11,27 @@ type Parser struct {
 	l         *lexer.Lexer // 字句解析器インスタンスへのポインタ, 次のトークンを取得するために使用する
 	curToken  token.Token  // 現在調べているトークン
 	peekToken token.Token  // 次のトークン
+	errors    []string
 }
 
 func New(l *lexer.Lexer) *Parser {
-	p := &Parser{l: l}
+	p := &Parser{
+		l:      l,
+		errors: []string{},
+	}
 	p.nextToken()
 	p.nextToken()
 
 	return p
+}
+
+func (p *Parser) Errors() []string {
+	return p.errors
+}
+
+func (p *Parser) peekError(t token.TokenType) {
+	msg := fmt.Sprintf("expexted next token to be %s, got %s instead", t, p.peekToken.Type)
+	p.errors = append(p.errors, msg)
 }
 
 func (p *Parser) nextToken() {
@@ -76,11 +90,15 @@ func (p *Parser) peekTokenIs(t token.TokenType) bool {
 	return p.peekToken.Type == t
 }
 
+/**
+peekトークンの型をチェックし型が正しい場合nextTokenを実行する。
+*/
 func (p *Parser) expectPeek(t token.TokenType) bool {
 	if p.peekTokenIs(t) {
 		p.nextToken()
 		return true
 	} else {
+		p.peekError(t)
 		return false
 	}
 }
